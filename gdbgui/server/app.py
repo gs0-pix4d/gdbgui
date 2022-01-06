@@ -25,6 +25,7 @@ app.config["gdb_command"] = None
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["project_home"] = None
 app.config["remap_sources"] = {}
+app.config["exit_with_last_session"] = False
 manager = SessionManager()
 app.config["_manager"] = manager
 app.secret_key = binascii.hexlify(os.urandom(24)).decode("utf-8")
@@ -214,6 +215,11 @@ def client_disconnected():
     """do nothing if client disconnects"""
     manager.disconnect_client(request.sid)
     logger.info("Client websocket disconnected, id %s" % (request.sid))
+    if app.config["exit_with_last_session"]:
+        shutdown_func = request.environ.get('werkzeug.server.shutdown')
+        if shutdown_func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        shutdown_func()
 
 
 @socketio.on("Client disconnected")

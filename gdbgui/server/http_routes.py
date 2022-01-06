@@ -198,6 +198,17 @@ def kill_session():
             401,
         )
 
+@blueprint.route("/kill_server")
+@authenticate
+def kill_server():
+    shutdown_func = request.environ.get('werkzeug.server.shutdown')
+    if shutdown_func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    shutdown_func()
+    return Response(
+        "gdbgui terminated",
+        400,
+    )
 
 @blueprint.route("/send_signal_to_pid", methods=["POST"])
 def send_signal_to_pid():
