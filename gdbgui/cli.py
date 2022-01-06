@@ -146,7 +146,11 @@ def get_parser():
         help='Set the project directory. When viewing the "folders" pane, paths are shown relative to this directory.',
     )
     other.add_argument("-v", "--version", help="Print version", action="store_true")
-
+    other.add_argument(
+        "--exit-with-last-session",
+        help="Exit gdbgui server once the last debugging session is killed.",
+        action="store_true",
+    )
     other.add_argument(
         "-n",
         "--no-browser",
@@ -235,6 +239,8 @@ def main():
                 "Warning: authentication is recommended when serving on a publicly "
                 "accessible IP address. See gdbgui --help."
             )
+
+    app.config["exit_with_last_session"] = args.exit_with_last_session
 
     if warn_startup_with_shell_off(platform.platform().lower(), args.gdb_cmd):
         logger.warning(
